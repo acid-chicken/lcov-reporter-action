@@ -1,4 +1,5 @@
 import { promises as fs } from "fs"
+import path from "path"
 import core from "@actions/core"
 import { GitHub, context } from "@actions/github"
 
@@ -13,8 +14,9 @@ const MAX_COMMENT_CHARS = 65536
 async function main() {
 	const token = core.getInput("github-token")
 	const githubClient = new GitHub(token)
-	const lcovFile = core.getInput("lcov-file") || "./coverage/lcov.info"
-	const baseFile = core.getInput("lcov-base")
+	const workingDirectory = core.getInput("working-directory") || "."
+	const lcovFile = path.resolve(workingDirectory, core.getInput("lcov-file") || "./coverage/lcov.info")
+	const baseFile = path.resolve(workingDirectory, core.getInput("lcov-base"))
 	const shouldFilterChangedFiles =
 		core.getInput("filter-changed-files").toLowerCase() === "true"
 	const shouldDeleteOldComments =
@@ -36,6 +38,7 @@ async function main() {
 	const options = {
 		repository: context.payload.repository.full_name,
 		prefix: normalisePath(`${process.env.GITHUB_WORKSPACE}/`),
+		workingDirectory: normalisePath(workingDirectory),
 	}
 
 	if (context.eventName === "pull_request") {
