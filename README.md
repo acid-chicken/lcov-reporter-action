@@ -16,9 +16,12 @@ Total Coverage: <b>99.39%</b>
 ## Inputs
 
 ##### `github-token` (**Optional**)
-Github token used for posting the comment. Defaults to `${{ github.token }}`.
+GitHub token used for posting the comment. Defaults to `${{ github.token }}`.
 
 For alternative `github-token` values see: [Creating Personal Access Tokens](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+
+#### `working-directory` (**Optional**)
+The working directory of where the test was ran. A property for compatibility with [`jobs.<job_id>.steps[*].run.working-directory`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun)
 
 ##### `lcov-file` (**Optional**)
 The location of the lcov file to read the coverage report from. Defaults to
@@ -40,7 +43,7 @@ If included, will be added as a title for the comment produced.
 ## Example usage
 
 ```yml
-uses: acid-chicken/lcov-reporter-action@v0.4.0
+uses: acid-chicken/lcov-reporter-action@v0.4.1
 with:
   lcov-file: ./coverage/lcov.info
 ```

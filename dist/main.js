@@ -4,8 +4,8 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 
 var fs = require('fs');
 var fs__default = _interopDefault(fs);
-var os = _interopDefault(require('os'));
 var path = _interopDefault(require('path'));
+var os = _interopDefault(require('os'));
 var child_process = _interopDefault(require('child_process'));
 var Stream = _interopDefault(require('stream'));
 var assert = _interopDefault(require('assert'));
@@ -15,6 +15,7 @@ var http = _interopDefault(require('http'));
 var Url = _interopDefault(require('url'));
 var https = _interopDefault(require('https'));
 var zlib = _interopDefault(require('zlib'));
+var pathPosix = _interopDefault(require('path/posix'));
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -22880,10 +22881,20 @@ function toRow(file, indent, options) {
 	)
 }
 
+function getLocation(file, options) {
+	const relative = pathPosix.relative(options.prefix, file.file);
+	const path =
+		options.workingDirectory
+			? pathPosix.join(options.workingDirectory, relative)
+			: relative;
+	const href = `https://github.com/${options.repository}/blob/${options.commit}/${path}`;
+
+	return { href, relative }
+}
+
 function filename(file, indent, options) {
-	const relative = file.file.replace(options.prefix, "");
-	const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}`;
-	const parts = relative.split("/");
+	const { href, relative } = getLocation(file, options);
+	const parts = relative.split(pathPosix.sep);
 	const last = parts[parts.length - 1];
 	const space = indent ? "&nbsp; &nbsp;" : "";
 	return fragment(space, a({ href }, last))
@@ -22919,8 +22930,7 @@ function uncovered(file, options) {
 				range.start === range.end
 					? `L${range.start}`
 					: `L${range.start}-L${range.end}`;
-			const relative = file.file.replace(options.prefix, "");
-			const href = `https://github.com/${options.repository}/blob/${options.commit}/${relative}#${fragment}`;
+			const href = `${getLocation(file, options).href}#${fragment}`;
 			const text =
 				range.start === range.end
 					? range.start
@@ -23092,10 +23102,13 @@ const MAX_COMMENT_CHARS = 65536;
 async function main$1() {
 	const token = core$1.getInput("github-token");
 	const githubClient = new github_2(token);
-	const lcovFile = core$1.getInput("lcov-file") || "./coverage/lcov.info";
-	const baseFile = core$1.getInput("lcov-base");
-	const shouldFilterChangedFiles = core$1.getInput("filter-changed-files").toLowerCase() === 'true';
-	const shouldDeleteOldComments = core$1.getInput("delete-old-comments").toLowerCase() === 'true';
+	const workingDirectory = core$1.getInput("working-directory") || ".";
+	const lcovFile = path.resolve(workingDirectory, core$1.getInput("lcov-file") || "./coverage/lcov.info");
+	const baseFile = path.resolve(workingDirectory, core$1.getInput("lcov-base"));
+	const shouldFilterChangedFiles =
+		core$1.getInput("filter-changed-files").toLowerCase() === "true";
+	const shouldDeleteOldComments =
+		core$1.getInput("delete-old-comments").toLowerCase() === "true";
 	const title = core$1.getInput("title");
 
 	const raw = await fs.promises.readFile(lcovFile, "utf-8").catch(err => null);
@@ -23113,6 +23126,7 @@ async function main$1() {
 	const options = {
 		repository: github_1.payload.repository.full_name,
 		prefix: normalisePath(`${process.env.GITHUB_WORKSPACE}/`),
+		workingDirectory: normalisePath(workingDirectory),
 	};
 
 	if (github_1.eventName === "pull_request") {
