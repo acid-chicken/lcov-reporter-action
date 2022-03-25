@@ -1,10 +1,10 @@
 {
-	"name": "lcov-reporter-action",
-	"version": "0.2.19",
+	"name": "code-coverage-reporter-action",
+	"version": "0.4.0",
 	"description": "Comments a pull request with the lcov code coverage",
 	"license": "MIT",
-	"author": "Romeo Van Snick",
-	"repository": "https://github.com/romeovs/lcov-reporter-action",
+	"author": "Acid Chicken",
+	"repository": "https://github.com/acid-chicken/code-coverage-reporter-action.git",
 	"keywords": [
 		"actions",
 		"pull-request",

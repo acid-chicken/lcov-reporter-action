@@ -1,4 +1,4 @@
-# Lcov reporter action
+# Code Coverage Reporter Action
 
 This action comments a pull request with a HTML test coverage report.
 
@@ -40,13 +40,13 @@ If included, will be added as a title for the comment produced.
 ## Example usage
 
 ```yml
-uses: romeovs/lcov-reporter-action@v0.2.16
+uses: acid-chicken/lcov-reporter-action@v0.4.0
 with:
   lcov-file: ./coverage/lcov.info
 ```
 
 ## Acknowledgements
 
-The initial code is based on [ziishaned/jest-reporter-action](https://github.com/ziishaned/jest-reporter-action).
+The initial code is based on [ziishaned/jest-reporter-action](https://github.com/ziishaned/jest-reporter-action) and [romeovs/lcov-reporter-action](https://github.com/romeovs/lcov-reporter-action).
 
 Changed file retrieval based on [jitterbit/get-changed-files](https://github.com/jitterbit/get-changed-files).
